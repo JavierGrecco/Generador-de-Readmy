@@ -232,6 +232,11 @@ def validar_archivo(ruta: str) -> Optional[str]:
     if camino.stat().st_size == 0:
         logging.error("El archivo '%s' está vacío.", ruta)
         return None
+
+    # Los archivos .docx son binarios, omitimos comprobación de texto
+    if camino.suffix.lower() == ".docx":
+        return str(camino)
+
     try:
         with open(camino, "r", encoding="utf-8") as f:
             f.read(1)
@@ -454,7 +459,6 @@ def envolver_comandos(texto: str) -> str:
             if codigo:
                 while codigo and codigo[-1].strip() == "":
                     codigo.pop()
-                # Si la última línea no parece comando, se devuelve como línea normal
                 if codigo and not any(codigo[-1].strip().startswith(c) for c in COMANDOS_CONOCIDOS):
                     ultima = codigo.pop()
                     resultado.append(f"```{lenguaje}")
